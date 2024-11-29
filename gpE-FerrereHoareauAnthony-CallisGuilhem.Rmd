@@ -1,8 +1,9 @@
 ---
 title: "Projet Analyse de Donnée"
-author: "FERRERE HOAREAAU Anthony; CALLIS Guilhem"
+author: "FERRERE HOAREAU Anthony et CALLIS Guilhem"
 date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -15,4 +16,6 @@ Chargement du jeux de donnée:
 ```{r echo=F}
 DataBio = read.table("DataProjet3MIC-2425.txt", header=TRUE)
 print(summary(DataBio))
+#g1 <- ggplot(data=DataBio, aes(x=T1_1H_R1, y=T1_6H_R1, color=ExpT1))+geom_boxplot()
+#print(g)
 ```
