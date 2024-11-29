@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## R Markdown
 Chargement du jeux de donnée:
 
-```{r}
+```{r echo=F}
 DataBio = read.table("DataProjet3MIC-2425.txt", header=TRUE)
 print(summary(DataBio))
 ```
