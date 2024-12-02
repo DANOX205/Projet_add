@@ -16,6 +16,7 @@ Chargement du jeux de donnée:
 ```{r echo=F}
 DataBio = read.table("DataProjet3MIC-2425.txt", header=TRUE)
 print(summary(DataBio))
-#g1 <- ggplot(data=DataBio, aes(x=T1_1H_R1, y=T1_6H_R1, color=ExpT1))+geom_boxplot()
-#print(g)
+#plot(x=DataBio$T1_1H_R1, y=DataBio$T1_6H_R1)
+g1 <- ggplot(data=DataBio, aes(x=T1_1H_R1, y=T1_6H_R1, color=ExpT1))+geom_point()
+print(g1)
 ```
