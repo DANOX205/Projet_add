@@ -3,6 +3,8 @@ title: "Projet Analyse de Donnée"
 author: "FERRERE HOAREAU Anthony et CALLIS Guilhem"
 date: "`r Sys.Date()`"
 output:
+  html_document:
+    df_print: paged
   pdf_document: default
 ---
 
