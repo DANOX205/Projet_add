@@ -3,9 +3,9 @@ title: "Projet Analyse de Donnée"
 author: "FERRERE HOAREAU Anthony et CALLIS Guilhem"
 date: "`r Sys.Date()`"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -16,6 +16,8 @@ knitr::opts_chunk$set(echo = TRUE)
 Chargement du jeux de donnée:
 
 ```{r echo=F}
+if (!require("ggplot2")) install.packages("ggplot2")
+library("ggplot2")
 DataBio = read.table("DataProjet3MIC-2425.txt", header=TRUE)
 print(summary(DataBio))
 #plot(x=DataBio$T1_1H_R1, y=DataBio$T1_6H_R1)
