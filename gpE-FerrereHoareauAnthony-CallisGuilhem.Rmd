@@ -24,3 +24,80 @@ print(summary(DataBio))
 g1 <- ggplot(data=DataBio, aes(x=T1_1H_R1, y=T1_6H_R1, color=ExpT1))+geom_point()
 print(g1)
 ```
+```{r echo=F}
+#Pour installer les packages
+if (!require("FactoMineR")) install.packages("FactoMineR")
+if (!require("factoextra")) install.packages("factoextra")
+if (!require("corrplot")) install.packages("corrplot")
+library(FactoMineR)
+library(factoextra)
+library(corrplot)
+# A présent, on passe sur l'ACP Centrée. Pour cela, on commence par centrer notre jeu de données.
+#ACP Centrée réduite (Toutes les variables ont la même importance)
+Tt_sH_Rr <- DataBio[c(1: 36)]
+DataBioC <- scale(Tt_sH_Rr, center=TRUE)
+
+# On fait la transposée pour avoir : les Tt_sH_Rr décrits par les gènes (J'avour je suis pas sûr à 100% pour ce passage. Sinon on peut enlever la transposée)
+ACP_DataBio_reduite <- PCA(DataBio[c(1:36)],  scale.unit = T, graph = F)
+ACP_DataBio_reduite$eig
+fviz_eig(ACP_DataBio_reduite,addlabels = TRUE, ylim = c(0, 100), main = "Valeurs propres")
+# Projection des individus
+fviz_pca_ind(ACP_DataBio_reduite, geom = c("point"),col.ind = "cos2", gradient.cols = c("blue", "red"), repel = TRUE, title = "Projection des individus (Tt_sH_Rr)")
+
+```
+
+```{r echo=F}
+# A présent,on va essayer de construire la matrice DataExpMoy. C'est une matrice de taille G * 18. Le nombre de lignes correspond aux gènes et les colonnes correspondent aux moyennes de T1,T2,T3 pour chaque heure. On a alors :
+# colonne 1 : moyenne(T1_1H_R1/2)
+# colonne 2 : moyenne(T1_2H_R1/2)
+# colonne 3 : moyenne(T1_3H_R1/2)
+# colonne 4 : moyenne(T1_4H_R1/2)
+# colonne 5 : moyenne(T1_5H_R1/2)
+# colonne 6 : moyenne(T1_6H_R1/2)
+# colonne 7 : moyenne(T2_1H_R1/2)
+# colonne 8 : moyenne(T2_2H_R1/2)
+# ...
+# colonne 18 : moyenne(T3_6H_R1/2)
+# On essaye de créer cette matrice :
+cols_T1_R1 <- grep("^T1_.*_R1$", colnames(DataBio))  # T1 pour R1
+cols_T1_R2 <- grep("^T1_.*_R2$", colnames(DataBio))  # T1 pour R2
+
+cols_T2_R1 <- grep("^T2_.*_R1$", colnames(DataBio))  # T2 pour R1
+cols_T2_R2 <- grep("^T2_.*_R2$", colnames(DataBio))  # T2 pour R2
+
+cols_T3_R1 <- grep("^T3_.*_R1$", colnames(DataBio))  # T3 pour R1
+cols_T3_R2 <- grep("^T3_.*_R2$", colnames(DataBio))  # T3 pour R2
+
+# Moyenne pour T1
+T1_means <- (DataBio[, cols_T1_R1] + DataBio[, cols_T1_R2]) / 2
+
+# Moyenne pour T2
+T2_means <- (DataBio[, cols_T2_R1] + DataBio[, cols_T2_R2]) / 2
+
+# Moyenne pour T3
+T3_means <- (DataBio[, cols_T3_R1] + DataBio[, cols_T3_R2]) / 2
+
+MatriceDataExpMoy <- cbind(T1_means, T2_means, T3_means)
+DataExpMoy <- as.data.frame(cbind(T1_means, T2_means, T3_means))
+
+# Pour vérifier la taille
+dim(DataExpMoy)  # Devrait être 542 × 18 (c'est bon)
+
+# On utilise T1 /T2 /T3 pour Identifier les gènes particulièrement influents pour un traitement spécifique.
+# Ajouter les colonnes ExpT1, ExpT2, ExpT3 pour un filtrage
+DataExpMoy_full <- cbind(MatriceDataExpMoy, ExpT1 = DataBio$ExpT1, ExpT2 = DataBio$ExpT2, ExpT3 = DataBio$ExpT3)
+
+# Moyenne des gènes surexprimés pour T1 à 6 heures
+mean_sur_T1_6H <- mean(DataExpMoy_full[DataExpMoy_full$ExpT1 == "Sur", "T1_6H"])
+print(mean_sur_T1_6H)
+# On fait la ACP de ce nouveau jeu de données
+
+DataExpMoyC <- scale(t(DataExpMoy), center=TRUE)
+# On fait la transposée pour avoir : les Tt_sH_Rr décrits par les gènes (J'avour je suis pas sûr à 100% pour ce passage. Sinon on peut enlever la transposée)
+ACP_DataExpMoy_reduite <- PCA(DataExpMoyC,  scale.unit = T, graph = F)
+ACP_DataExpMoy_reduite$eig
+fviz_eig(ACP_DataExpMoy_reduite,addlabels = TRUE, ylim = c(0, 100), main = "Valeurs propres")
+# Projection des DataExpMoy
+fviz_pca_ind(ACP_DataExpMoy_reduite, geom = c("point"),col.ind = "cos2", gradient.cols = c("blue", "red"), repel = TRUE, title = "Projection des DataExpMoy")
+
+```
